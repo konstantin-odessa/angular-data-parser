@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<users>
+    <user id="3">
+        <firstName>FirstName3</firstName>
+        <email>email3@gmail.com</email>
+    </user>
+    <user id="7">
+        <firstName>FirstName6</firstName>
+        <secondName>SecondName7</secondName>
+    </user>
+    <user id="4">
+        <firstName>FirstName4</firstName>
+        <secondName>SecondName4</secondName>
+        <email>email4@gmail.com</email>
+        <phoneNumber>+123456789012</phoneNumber>
+    </user>
+    <user id="6">
+        <secondName>sECONDnAMe6</secondName>
+        <email>email6@gmail.com</email>
+        <phoneNumber>+123456789012</phoneNumber>
+    </user>
+    <user id="5">
+        <firstName>FirstName5</firstName>
+        <secondName>SecondName5</secondName>
+        <email>+123456789012</email>
+    </user>
+</users>
