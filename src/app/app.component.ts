@@ -1,19 +1,24 @@
 import { Component } from '@angular/core';
 import { DataLoaderService } from './data-loader.service';
 import { Observable } from 'rxjs/Observable';
-import { Parser } from './parser/parser';
-
 
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
-    styleUrls: ['./app.component.css']
+    styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-    title = 'app';
-    formatList: string[] = ['json', 'xml'];
+    formatList: string[] = ['json', 'xml', 'csv'];
+    formattedData: any[] = [];
+    tableHeading: any[] = [];
+    isDataLoaded = false;
+    sortBy: string;
 
     constructor(private dataLoaderService: DataLoaderService) {
+    }
+
+    sorter(value: string) {
+        this.sortBy = value;
     }
 
     concatenate(result: any[], curr: any[]): void {
@@ -33,10 +38,27 @@ export class AppComponent {
     }
 
     readData() {
-        this.dataLoaderService.getData(this.formatList, this.concatenate)
-            .subscribe((parser: Parser) => {
-                parser.asyncData.subscribe(data => console.log(data));
-                parser.parseByFormats();
+        this.dataLoaderService.getData(this.formatList)
+            .subscribe((asyncData: Observable<any>) => {
+                let jsonData: any;
+                asyncData
+                    .subscribe((dataObj: { format: string, data: any }) => {
+                            if (dataObj.format === 'json') {
+                                jsonData = dataObj.data.users;
+                                return;
+                            }
+                            this.concatenate(this.formattedData, dataObj.data.users);
+                            console.log(this.formattedData);
+                        },
+                        (err) => { console.error('Error: %s', err); },
+                        () => {
+                            console.log('parsing completed!');
+                            this.concatenate(this.formattedData, jsonData);
+                            /* data to fill table heading */
+                            this.tableHeading = Object.keys(this.formattedData[0]);
+                            this.isDataLoaded = true;
+                            this.sorter('id');
+                        });
             });
     }
 }

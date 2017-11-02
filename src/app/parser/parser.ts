@@ -5,56 +5,44 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/publishLast';
 
 import { Subject } from 'rxjs/Subject';
-
+import { Injectable } from '@angular/core';
+@Injectable()
 export class Parser {
-    private subj: Subject<any> = new Subject();
-    asyncData: any = this.subj.asObservable().publishLast().refCount();
-    // asyncData: any = this.subj.asObservable();
+    private subj: ReplaySubject<any> = new ReplaySubject();
+    asyncData: any = this.subj.asObservable();
 
-    data: any[];
-    jsonFormatData: any;
-    formatsList: string[];
-    formatsMap: Map<string, boolean> = new Map();
-    concData: any = [];
-    cb: Function;
+    private parsedFormatsList: { format: string, parsed: boolean }[];
 
-    constructor(formatsList: string[], data: any, cb: Function) {
-        this.data = data;
-        this.cb = cb;
-        this.formatsList = formatsList;
-        this.formatsList.forEach((format: string) => {
-            this.formatsMap.set(format, false);
+    parseByFormats(formatsList: string[], data: any): void {
+        this.parsedFormatsList = formatsList
+            .filter(parseFormatFunc => this[parseFormatFunc])
+            .map((format: string) => ({ format: format, parsed: false }));
+
+        data.forEach((item, index) => {
+            /* check if format parser function exists in Parser prototype */
+            if (this[formatsList[index]]) {
+                this[formatsList[index]](item);
+            }
         });
     }
+    protected emit(format: string, data: any): void {
+        this.parsedFormatsList
+            .find((item: { format: string, parsed: boolean }) => item.format === format)
+            .parsed = true;
+        this.subj.next({ format: format, data: data });
 
-    parseByFormats(): void {
-        this.data.forEach((item, index) => this[this.formatsList[index]](item));
-        // return this.asyncData;
-    }
-    emit(format: string, data: any): void {
-        if (format === 'json') {
-            this.jsonFormatData = data;
-        }
-        this.cb(this.concData, data.users);
-        this.subj.next(this.concData);
-        this.formatsMap.set(format, true);
-        const list = [];
-        this.formatsMap.forEach((value: boolean, key: string) => {
-            list.push(value);
-        });
-        const result = list.every(item => item);
-        if (result) {
+        if (this.parsedFormatsList
+                .every((item: { format: string, parsed: boolean }) => item.parsed)) {
             this.subj.complete();
-            // this.asyncData.connect();
         }
     }
 
-    json(response: Response) {
+    /* parse functions; to add more parsing functions you can extend Parser class and implement additional parse logic */
+    private json(response: Response) {
         const data = response.json();
-
         this.emit('json', data);
     }
-    xml(response: Response) {
+    private xml(response: Response) {
         const self = this;
         xml2js.parseString( response.text(), function (err, result) {
             result.users = result.users.user.map(item => {
@@ -69,5 +57,4 @@ export class Parser {
             self.emit('xml', result);
         });
     }
-    csv() {}
 }

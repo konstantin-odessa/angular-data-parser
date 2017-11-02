@@ -1,9 +1,24 @@
-
 <div class="container">
     <div class="row">
         <div class="col-xs-8 col-xs-offset-2">
-            <h1>Test App</h1>
-            <button class="btn btn-primary" (click)="readData()">Загрузить данные</button>
+            <div class="text-center">
+                <h1>Test App</h1>
+                <button class="btn btn-primary"
+                        [disabled]="isDataLoaded"
+                        (click)="readData()">Загрузить данные</button>
+            </div>
+            <table class="table table-stripped"
+                   [style.marginTop]="'20px'">
+                <tr>
+                    <th *ngFor="let heading of tableHeading">
+                        <button class="btn btn-success"
+                                (click)="sorter(heading)">{{ heading }}</button>
+                    </th>
+                </tr>
+                <tr *ngFor="let data of formattedData | sort : sortBy">
+                    <td *ngFor="let cellHeading of tableHeading">{{ data[cellHeading] }}</td>
+                </tr>
+            </table>
         </div>
     </div>
 </div>

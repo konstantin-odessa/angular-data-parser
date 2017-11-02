@@ -4,21 +4,18 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/zip';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
+import 'rxjs/add/observable/throw';
+
 import { Parser } from './parser/parser';
 
 @Injectable()
 export class DataLoaderService {
-    constructor(private http: Http) {}
+    constructor(private http: Http, private parser: Parser) {}
 
-    getData(formatsList: string[], cb: Function): any {
-        return Observable.zip(...formatsList.map(this.parseRequest), function(...data) {
-            const t = new Parser(formatsList, data, cb);
-            // t.asyncData.subscribe(items => {
-            //     console.log(items);
-            // });
-            // t.parse(data);
-
-            return t;
+    getData(formatsList: string[]): any {
+        return Observable.zip(...formatsList.map(this.parseRequest), (...data) => {
+            this.parser.parseByFormats(formatsList, data);
+            return this.parser.asyncData;
         });
     }
 
@@ -33,23 +30,13 @@ export class DataLoaderService {
             // .map(this.extractData)
             .catch(this.handleError);
     }
-    private parseResponse(format: string) {
-
-    }
 
     private extractData(res: Response) {
         const body = res.json();
         return body || {};
     }
     private handleError(error: Response | any) {
-        let errMsg: string;
-        if (error instanceof Response) {
-            const body = error.json() || '';
-            const err = body.error || JSON.stringify(body);
-            errMsg = `${error.status} - ${error.statusText || ''} ${err}`;
-        } else {
-            errMsg = error.message ? error.message : error.toString();
-        }
+        const errMsg: string = error.toString();
         console.error(errMsg);
         return Observable.throw(errMsg);
     }

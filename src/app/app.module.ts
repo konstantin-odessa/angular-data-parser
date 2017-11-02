@@ -4,10 +4,14 @@ import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { DataLoaderService } from './data-loader.service';
 import { HttpModule } from '@angular/http';
+import { GroupPipe } from './sort.pipe';
+import { Parser } from './parser/parser';
+import { Parser2 } from './parser/parser2';
 
 @NgModule({
     declarations: [
-        AppComponent
+        AppComponent,
+        GroupPipe,
     ],
     imports: [
         BrowserModule,
@@ -15,6 +19,10 @@ import { HttpModule } from '@angular/http';
     ],
     providers: [
         DataLoaderService,
+        {
+            provide: Parser,
+            useClass: Parser2,
+        }
     ],
     bootstrap: [AppComponent]
 })
