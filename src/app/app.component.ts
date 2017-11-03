@@ -8,9 +8,14 @@ import { Observable } from 'rxjs/Observable';
     styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
+    /* file formats to parse */
     formatList: string[] = ['json', 'xml', 'csv'];
+    /* parsed and concatenated data */
     formattedData: any[] = [];
+
+    /* table layout */
     tableHeading: any[] = [];
+    /* disable btn when clicked "loadData" */
     isDataLoaded = false;
     sortBy: string;
 
@@ -21,6 +26,8 @@ export class AppComponent {
         this.sortBy = value;
     }
 
+    /* this function concatenates parsed data objects */
+    /* and   */
     concatenate(result: any[], curr: any[]): void {
         for (let i = 0; i < curr.length; i++) {
             const obj = curr[i];
@@ -37,7 +44,7 @@ export class AppComponent {
         }
     }
 
-    readData() {
+    loadData() {
         this.dataLoaderService.getData(this.formatList)
             .subscribe((asyncData: Observable<any>) => {
                 let jsonData: any;

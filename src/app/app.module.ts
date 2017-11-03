@@ -5,8 +5,8 @@ import { AppComponent } from './app.component';
 import { DataLoaderService } from './data-loader.service';
 import { HttpModule } from '@angular/http';
 import { GroupPipe } from './sort.pipe';
-import { Parser } from './parser/parser';
-import { Parser2 } from './parser/parser2';
+import { CsvParser, JsonParser, Parser, XmlParser } from './parser/parser';
+import { FormatParser } from './parser/format-parser';
 
 @NgModule({
     declarations: [
@@ -17,11 +17,22 @@ import { Parser2 } from './parser/parser2';
         BrowserModule,
         HttpModule,
     ],
+
     providers: [
         DataLoaderService,
+        JsonParser,
+        XmlParser,
+        CsvParser,
         {
             provide: Parser,
-            useClass: Parser2,
+            useFactory: (...parsers: FormatParser[]) => {
+                return new Parser(parsers);
+            },
+            deps: [
+                JsonParser,
+                XmlParser,
+                CsvParser,
+            ]
         }
     ],
     bootstrap: [AppComponent]
