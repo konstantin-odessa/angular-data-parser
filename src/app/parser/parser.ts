@@ -3,6 +3,7 @@ import 'rxjs/add/operator/publishLast';
 import { Response } from '@angular/http';
 import { Injectable } from '@angular/core';
 import { FormatParser, FormatType } from './format-parser';
+import { ParserData } from './parser-data.model';
 
 @Injectable()
 export class Parser {
@@ -18,17 +19,14 @@ export class Parser {
 
     parseByFormats(formatsList: any[], data: Response[]): void {
         this.parsedFormatsList = formatsList
-            // .filter(parseFormatFunc => this[parseFormatFunc])
             .filter((format: FormatType) => this.parsersMap.has(format))
             .map((format: FormatType) => ({ format: format, parsed: false }));
 
         data.forEach((item, index) => {
-            /* check if format parser function exists in Parser prototype */
-            // if (this[formatsList[index]]) {
+            /* check if format parser function exists in parserMap */
             if (this.parsersMap.has(formatsList[index])) {
-                    const asyncResult: Promise<any> = this.parsersMap.get(formatsList[index]).parse(item.text());
+                    const asyncResult: Promise<ParserData> = this.parsersMap.get(formatsList[index]).parse(item.text());
 
-                // const asyncResult: Promise<any> = this[formatsList[index]](item);
                 asyncResult.then(
                     (result: { format: FormatType, data: any }) => {
                         this.emit(result.format, result.data);

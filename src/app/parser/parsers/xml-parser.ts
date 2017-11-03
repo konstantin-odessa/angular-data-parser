@@ -1,12 +1,12 @@
 import { FormatParser, FormatType } from '../format-parser';
-import { Response } from '@angular/http';
 import * as xml2js from 'xml2js';
+import { ParserData } from '../parser-data.model';
 
 export class XmlParser extends FormatParser {
     get parserType(): FormatType {
         return FormatType.xml;
     }
-    parse(response: string): Promise<any> {
+    parse(response: string): Promise<ParserData> {
         return new Promise((resolve, reject) => {
             xml2js.parseString( response, function (err, result) {
                 result.users = result.users.user.map(item => {

@@ -1,5 +1,4 @@
-import { Response } from '@angular/http';
-
+import { ParserData } from './parser-data.model';
 export enum FormatType {
     csv = <any> 'csv',
     xml = <any> 'xml',
@@ -8,5 +7,5 @@ export enum FormatType {
 
 export abstract class FormatParser {
     abstract get parserType(): FormatType;
-    abstract parse(response: string): Promise<any>;
+    abstract parse(response: string): Promise<ParserData>;
 }
