@@ -28,9 +28,7 @@ import { ParserAggregator } from './parser/parser-aggregator';
         CsvParser,
         {
             provide: ParserAggregator,
-            useFactory: (...parsers: FormatParser[]) => {
-                return new ParserAggregator(parsers);
-            },
+            useFactory: parserAggregatorFactory,
             deps: [
                 JsonParser,
                 XmlParser,
@@ -41,4 +39,8 @@ import { ParserAggregator } from './parser/parser-aggregator';
     bootstrap: [AppComponent]
 })
 export class AppModule {
+}
+
+export function parserAggregatorFactory(...parsers: FormatParser[]) {
+    return new ParserAggregator(parsers);
 }
