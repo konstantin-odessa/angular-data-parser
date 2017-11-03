@@ -9,7 +9,7 @@ import { FormatParser } from './parser/format-parser';
 import { JsonParser } from './parser/parsers/json-parser';
 import { XmlParser } from './parser/parsers/xml-parser';
 import { CsvParser } from './parser/parsers/csv-parser';
-import { Parser } from './parser/parser';
+import { ParserAggregator } from './parser/parser-aggregator';
 
 @NgModule({
     declarations: [
@@ -27,9 +27,9 @@ import { Parser } from './parser/parser';
         XmlParser,
         CsvParser,
         {
-            provide: Parser,
+            provide: ParserAggregator,
             useFactory: (...parsers: FormatParser[]) => {
-                return new Parser(parsers);
+                return new ParserAggregator(parsers);
             },
             deps: [
                 JsonParser,

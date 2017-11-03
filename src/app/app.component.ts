@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { DataLoaderService } from './data-loader.service';
 import { Observable } from 'rxjs/Observable';
+import { FormatType } from './parser/format-parser';
 
 @Component({
     selector: 'app-root',
@@ -9,7 +10,7 @@ import { Observable } from 'rxjs/Observable';
 })
 export class AppComponent {
     /* file formats to parse */
-    formatList: string[] = ['json', 'xml', 'csv'];
+    formatList: FormatType[] = [FormatType.json, FormatType.xml, FormatType.csv];
     /* parsed and concatenated data */
     formattedData: any[] = [];
 
@@ -27,7 +28,7 @@ export class AppComponent {
     }
 
     /* this function concatenates parsed data objects */
-    /* and   */
+
     concatenate(result: any[], curr: any[]): void {
         for (let i = 0; i < curr.length; i++) {
             const obj = curr[i];
@@ -36,6 +37,7 @@ export class AppComponent {
             res ? res = assign(res, obj) : result.push(obj);
         }
 
+        /* replace object properties from first argument by object properties from second argument */
         function assign(obj1, obj2) {
             const source = Object.keys(obj1) > Object.keys(obj2) ? Object.keys(obj1) : Object.keys(obj2);
             return source.forEach((key) => {
@@ -49,8 +51,9 @@ export class AppComponent {
             .subscribe((asyncData: Observable<any>) => {
                 let jsonData: any;
                 asyncData
-                    .subscribe((dataObj: { format: string, data: any }) => {
-                            if (dataObj.format === 'json') {
+                    .subscribe((dataObj: { format: FormatType, data: any }) => {
+                            /* store data if type of file === json */
+                            if (dataObj.format === FormatType.json) {
                                 jsonData = dataObj.data.users;
                                 return;
                             }
@@ -60,10 +63,13 @@ export class AppComponent {
                         (err) => { console.error('Error: %s', err); },
                         () => {
                             console.log('parsing completed!');
+                            /* concatenate data from parsed json file */
+                            /* we do this because we want json data override for object properties */
                             this.concatenate(this.formattedData, jsonData);
                             /* data to fill table heading */
                             this.tableHeading = Object.keys(this.formattedData[0]);
                             this.isDataLoaded = true;
+                            /* sort by id */
                             this.sorter('id');
                         });
             });
