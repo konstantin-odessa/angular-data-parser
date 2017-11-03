@@ -5,8 +5,11 @@ import { AppComponent } from './app.component';
 import { DataLoaderService } from './data-loader.service';
 import { HttpModule } from '@angular/http';
 import { GroupPipe } from './sort.pipe';
-import { CsvParser, JsonParser, Parser, XmlParser } from './parser/parser';
 import { FormatParser } from './parser/format-parser';
+import { JsonParser } from './parser/json-parser/json-parser';
+import { XmlParser } from './parser/xml-parser/xml-parser';
+import { CsvParser } from './parser/csv-parser/csv-parser';
+import { Parser } from './parser/parser';
 
 @NgModule({
     declarations: [
